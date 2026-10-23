@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DataQA — Analytics data reconciliation for agencies and online stores</title>
+  <meta name="description" content="We reconcile your CRM, GA4, data warehouse and dashboards against each other. Find lost orders, duplicate purchases and missing traffic sources. One-off audit $100–600, ongoing monitoring from $20/month.">
+  <link rel="canonical" href="https://data-verification.com/">
+  <meta name="robots" content="index, follow, max-snippet:-1">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://data-verification.com/">
+  <meta property="og:title" content="DataQA — find the orders your analytics never counted">
+  <meta property="og:description" content="Reconcile CRM, GA4, warehouse and dashboards. Audit from $100, monitoring from $20/month.">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230F5E5A'/><path d='M9 16.5l4.5 4.5L23 11.5' stroke='white' stroke-width='3.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Structured data: helps Google and AI assistants understand the service, prices and FAQ.
+       Domain and contacts: data-verification.com — to switch zone run ./set-domain.sh -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "ProfessionalService",
+        "@id": "https://data-verification.com/#business",
+        "name": "DataQA",
+        "url": "https://data-verification.com/",
+        "description": "Analytics data reconciliation service. We compare CRM, GA4, ad platforms, data warehouses and dashboards against each other to find lost orders, duplicate purchases, missing traffic sources and broken tracking.",
+        "areaServed": "Worldwide",
+        "priceRange": "$20–$600",
+        "email": "hello@data-verification.com",
+        "knowsAbout": ["GA4", "Google Analytics 4", "BigQuery", "data reconciliation", "conversion tracking", "Google Tag Manager", "data quality", "CRM attribution", "server-side tracking", "data warehouse QA"],
+        "makesOffer": [
+          {
+            "@type": "Offer",
+            "name": "Analytics data audit",
+            "description": "One-off reconciliation of all systems in a project: CRM, GA4, ad platforms, warehouse, dashboards and on-site tracking. PDF report and fix list.",
+            "priceSpecification": { "@type": "PriceSpecification", "minPrice": 100, "maxPrice": 600, "priceCurrency": "USD" }
+          },
+          {
+            "@type": "Offer",
+            "name": "Data quality monitoring — per report",
+            "description": "Scheduled reconciliation of one report or dashboard against source data.",
+            "priceSpecification": { "@type": "UnitPriceSpecification", "price": 20, "priceCurrency": "USD", "unitText": "per report per month" }
+          },
+          {
+            "@type": "Offer",
+            "name": "Data quality monitoring — whole project",
+            "description": "Scheduled reconciliation of every system, warehouse layer, dashboard and on-site tracker in a project.",
+            "priceSpecification": { "@type": "UnitPriceSpecification", "price": 150, "priceCurrency": "USD", "unitText": "per month" }
+          }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          { "@type": "Question", "name": "What access do you need?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Read-only access only: viewer role in GA4 or BigQuery, read-only CRM user, a warehouse user with SELECT on the tables we check. If you can't grant access, we work from exports in any format: CSV, Excel, JSON." } },
+          { "@type": "Question", "name": "What happens to personal data?",
+            "acceptedAnswer": { "@type": "Answer", "text": "It never reaches reports or normalized tables: emails and phone numbers are replaced with one-way hashes. Records can still be matched across systems by hash, but the original data cannot be restored." } },
+          { "@type": "Question", "name": "How is this different from GA4's built-in diagnostics?",
+            "acceptedAnswer": { "@type": "Answer", "text": "GA4 diagnostics only look at GA4. We compare GA4 with your CRM, warehouse, dashboards and what your website actually sends, order by order, and check your project's own business rules." } },
+          { "@type": "Question", "name": "Can agencies white-label the reports?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes. PDF reports carry your agency name, contact and brand color. Monitoring can be added one client project at a time." } },
+          { "@type": "Question", "name": "How much does an analytics audit cost?",
+            "acceptedAnswer": { "@type": "Answer", "text": "From $100 to $600 depending on data volume and the number of systems. Ongoing monitoring costs $20 per month per report or dashboard, or $150 per month for a whole project." } }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <!-- ================================================================
+       TRACKING (in <head>): paste Google Tag Manager, GA4 (gtag.js),
+       ad pixels or your own tracker here.
+       The site pushes these events to window.dataLayer:
+         service_select    — a service tab was chosen (service)
+         calculator_change — the estimate changed (service, price)
+         form_start        — the request form was started
+         generate_lead     — the request was sent (lead_id, service, value, currency)
+       Catch them in GTM with "Custom Event" triggers.
+       ================================================================ -->
+
+  <script src="config.js"></script>
+</head>
+<body>
+  <!-- TRACKING (right after <body>): the <noscript> part of Google Tag Manager goes here -->
+
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="top">
+    <div class="wrap top__in">
+      <a class="logo" href="#" aria-label="DataQA — back to top">
+        <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true"><rect width="32" height="32" rx="7" fill="currentColor"/><path d="M9 16.5l4.5 4.5L23 11.5" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>DataQA</span>
+      </a>
+      <nav class="nav" aria-label="Sections">
+        <a href="#finds">What we find</a>
+        <a href="#services">Pricing</a>
+        <a href="#security">Data security</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <a class="btn btn--small" href="#lead">Get a quote</a>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="wrap hero__in">
+        <div class="hero__text">
+          <h1>Your CRM says 1,000 orders. GA4 says 830. We find the other 170.</h1>
+          <p class="hero__lead">We reconcile your CRM, GA4, data warehouse and dashboards against each other — so you know which numbers to trust, how much revenue your ad platforms can't see, and exactly what to fix.</p>
+          <div class="hero__cta">
+            <a class="btn" href="#services">Estimate the cost</a>
+            <a class="btn btn--ghost" href="#lead">Talk to us</a>
+          </div>
+          <p class="hero__note">Read-only access. Personal data is hashed before analysis. NDA on request. <a href="sample-report.pdf" target="_blank" rel="noopener">See a sample report</a></p>
+        </div>
+
+        <figure class="ledger" aria-label="Example: reconciling CRM orders with GA4 purchases">
+          <figcaption class="ledger__head">
+            <span>Weekly order reconciliation</span>
+            <button class="ledger__replay" type="button" id="replay">Run again</button>
+          </figcaption>
+          <div class="ledger__cols" role="table">
+            <div class="ledger__row ledger__row--h" role="row">
+              <span role="columnheader">CRM</span><span role="columnheader">Amount</span><span role="columnheader">GA4</span><span role="columnheader">Result</span>
+            </div>
+            <div class="ledger__row" role="row" data-state="ok"><span>#100412</span><span>$420</span><span>#100412</span><span class="st">match</span></div>
+            <div class="ledger__row" role="row" data-state="dup"><span>#100413</span><span>$185</span><span>#100413 ×2</span><span class="st">duplicate</span></div>
+            <div class="ledger__row" role="row" data-state="miss"><span>#100414</span><span>$999</span><span>—</span><span class="st">missing in GA4</span></div>
+            <div class="ledger__row" role="row" data-state="src"><span>#100415</span><span>$310</span><span>#100415</span><span class="st">google/cpc → direct</span></div>
+            <div class="ledger__row" role="row" data-state="ok"><span>#100416</span><span>$240</span><span>#100416</span><span class="st">match</span></div>
+            <div class="ledger__row" role="row" data-state="miss"><span>#100417</span><span>$670</span><span>—</span><span class="st">missing in GA4</span></div>
+          </div>
+          <div class="ledger__sum">
+            <div class="meter" aria-hidden="true"><i id="meter"></i></div>
+            <p><b id="found">0%</b> of CRM orders found in GA4. Your ad platforms can't see <b>$1,669</b> in&nbsp;revenue.</p>
+          </div>
+        </figure>
+      </div>
+    </section>
+
+    <!-- DEFINITION: written to be quotable by search and AI assistants -->
+    <section class="define" id="what">
+      <div class="wrap define__in">
+        <h2>What is analytics data reconciliation?</h2>
+        <div>
+          <p>Analytics data reconciliation means comparing the same business events — orders, leads, payments — across every system that records them, record by record. Your CRM or store backend is the source of truth; GA4, ad platforms, your data warehouse and dashboards are checked against it.</p>
+          <p>The result is a list of concrete discrepancies: which orders never reached analytics, which were counted twice, where the traffic source was lost, and which dashboard numbers don't match the data behind them.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHAT WE FIND -->
+    <section class="finds" id="finds">
+      <div class="wrap">
+        <h2>What we find</h2>
+        <p class="sub">The usual reasons your reports don't match the money in the bank.</p>
+        <dl class="finds__list">
+          <div><dt>Orders lost on the way to analytics</dt><dd>We match by order ID and show where the loss happens: web or app, which page, which traffic source.</dd></div>
+          <div><dt>Duplicate purchases</dt><dd>Purchase events re-sent on thank-you page reloads, two GA4 tags firing at once, double loads into the warehouse.</dd></div>
+          <div><dt>Conversions credited to the wrong channel</dt><dd>Clicks with a gclid recorded as direct traffic, or your payment provider showing up as the referral source.</dd></div>
+          <div><dt>Leads that never reach the CRM</dt><dd>The form was submitted but no lead was created — or it was, without UTM parameters.</dd></div>
+          <div><dt>Warehouses and dashboards that disagree</dt><dd>Days and rows dropped between layers, incomplete marts, dashboard numbers that don't match the data behind them.</dd></div>
+          <div><dt>Broken tracking on the website</dt><dd>Double page_view, tags firing before cookie consent, personal data in requests, dataLayer events with no tag attached.</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- SERVICES: INTERACTIVE ESTIMATE -->
+    <section class="services" id="services">
+      <div class="wrap">
+        <h2>Services and pricing</h2>
+        <p class="sub">Pick a format and see the price instantly. Your selection is sent along with your request.</p>
+
+        <div class="picker" role="tablist" aria-label="Service">
+          <button class="pick" role="tab" id="tab-audit" aria-controls="panel-audit" aria-selected="true" data-service="audit">
+            <span class="pick__name">Data audit</span>
+            <span class="pick__price">$100–600, one-off</span>
+          </button>
+          <button class="pick" role="tab" id="tab-sub" aria-controls="panel-sub" aria-selected="false" data-service="subscription">
+            <span class="pick__name">Ongoing monitoring</span>
+            <span class="pick__price">from $20 per month</span>
+          </button>
+          <button class="pick" role="tab" id="tab-custom" aria-controls="panel-custom" aria-selected="false" data-service="custom">
+            <span class="pick__name">Something else</span>
+            <span class="pick__price">let's discuss</span>
+          </button>
+        </div>
+
+        <div class="panel" role="tabpanel" id="panel-audit" aria-labelledby="tab-audit">
+          <div class="panel__body">
+            <p class="panel__intro">A one-off check of the whole project: we reconcile every system against the others, find losses and duplicates, and hand over a report plus a fix list for your developers.</p>
+
+            <fieldset class="field">
+              <legend>Monthly data volume</legend>
+              <div class="seg" id="volume">
+                <label><input type="radio" name="volume" value="0" checked><span>up to 100K rows</span></label>
+                <label><input type="radio" name="volume" value="1"><span>up to 1M</span></label>
+                <label><input type="radio" name="volume" value="2"><span>up to 10M</span></label>
+                <label><input type="radio" name="volume" value="3"><span>over 10M</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="field">
+              <legend>Systems to check</legend>
+              <div class="chips" id="tools">
+                <label><input type="checkbox" value="CRM or store backend" checked><span>CRM or store backend</span></label>
+                <label><input type="checkbox" value="GA4" checked><span>GA4</span></label>
+                <label><input type="checkbox" value="Ad platforms"><span>Ad platforms</span></label>
+                <label><input type="checkbox" value="Data warehouse"><span>Data warehouse</span></label>
+                <label><input type="checkbox" value="Dashboards"><span>Dashboards</span></label>
+                <label><input type="checkbox" value="Website tracking"><span>Website tracking</span></label>
+                <label><input type="checkbox" value="Other analytics"><span>Other analytics</span></label>
+              </div>
+            </fieldset>
+          </div>
+          <aside class="total" aria-live="polite">
+            <p class="total__label">Estimated</p>
+            <p class="total__price"><span id="audit-price">$140</span></p>
+            <p class="total__hint" id="audit-hint">We confirm the exact price once we've seen the data.</p>
+            <button class="btn btn--wide" type="button" data-apply="audit">Request with this estimate</button>
+          </aside>
+        </div>
+
+        <div class="panel" role="tabpanel" id="panel-sub" aria-labelledby="tab-sub" hidden>
+          <div class="panel__body">
+            <p class="panel__intro">We re-run the checks on a schedule and send a report: what broke, what got fixed since last time, and what to do next.</p>
+
+            <fieldset class="field">
+              <legend>What we monitor</legend>
+              <div class="plans" id="plan">
+                <label class="plan">
+                  <input type="radio" name="plan" value="reports" checked>
+                  <span class="plan__body">
+                    <span class="plan__name">Individual reports or dashboards</span>
+                    <span class="plan__price">$20 per month each</span>
+                  </span>
+                </label>
+                <label class="plan">
+                  <input type="radio" name="plan" value="project">
+                  <span class="plan__body">
+                    <span class="plan__name">Whole project</span>
+                    <span class="plan__price">$150 per month</span>
+                  </span>
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="field" id="reports-field">
+              <label class="field__label" for="reports">Number of reports or dashboards</label>
+              <div class="stepper">
+                <button type="button" class="stepper__btn" data-step="-1" aria-label="Fewer">−</button>
+                <input id="reports" type="number" min="1" max="50" value="3" inputmode="numeric">
+                <button type="button" class="stepper__btn" data-step="1" aria-label="More">+</button>
+              </div>
+            </div>
+          </div>
+          <aside class="total" aria-live="polite">
+            <p class="total__label">Per month</p>
+            <p class="total__price"><span id="sub-price">$60</span></p>
+            <p class="total__hint" id="sub-hint">Each report or dashboard is checked against its source data.</p>
+            <button class="btn btn--wide" type="button" data-apply="subscription">Request with this estimate</button>
+          </aside>
+        </div>
+
+        <div class="panel" role="tabpanel" id="panel-custom" aria-labelledby="tab-custom" hidden>
+          <div class="panel__body">
+            <p class="panel__intro">Need something specific — a one-off check of a single report, validating a new tracker against GA4, or setting up scheduled checks on your own servers? Describe it and we'll suggest a format and price.</p>
+            <label class="field__label" for="custom-text">What should we check?</label>
+            <textarea id="custom-text" rows="5" placeholder="Example: since our last release GA4 shows 20% fewer purchases than Shopify. We want to know where they're lost."></textarea>
+          </div>
+          <aside class="total">
+            <p class="total__label">Price</p>
+            <p class="total__price">let's discuss</p>
+            <p class="total__hint">We'll reply with a proposed scope and price.</p>
+            <button class="btn btn--wide" type="button" data-apply="custom">Continue to request</button>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="process" id="process">
+      <div class="wrap">
+        <h2>How it works</h2>
+        <ol class="steps">
+          <li><h3>Access or exports</h3><p>You grant read-only access or send exports: CRM, GA4, warehouse, dashboards. Never send passwords by email — we'll set up a secure handover.</p></li>
+          <li><h3>First reconciliation</h3><p>We match systems by order and lead IDs, by day and by event, and check what your website's tags actually send.</p></li>
+          <li><h3>Report and fix list</h3><p>A PDF for decision-makers with key findings and revenue at risk, plus a spreadsheet of lost records for your developers.</p></li>
+          <li><h3>Scheduled monitoring</h3><p>On a subscription we repeat the checks weekly or monthly. Every report shows what broke and what got fixed since the last one.</p></li>
+        </ol>
+        <div class="deliver">
+          <h3>What you get</h3>
+          <ul>
+            <li>A PDF report with a data quality score and recommendations — white-labeled for agencies.</li>
+            <li>A spreadsheet of lost orders and leads, duplicates and day-by-day discrepancies.</li>
+            <li>Normalized tables from every source in one schema, with personal data hashed — ready to load into your warehouse.</li>
+          </ul>
+          <p class="deliver__sample"><a href="sample-report.pdf" target="_blank" rel="noopener">Download a sample report (PDF, demo data)</a></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- DATA SECURITY: trust section -->
+    <section class="security" id="security">
+      <div class="wrap">
+        <h2>How we handle your data</h2>
+        <p class="sub">You're trusting us with your business data. Here's exactly what that means.</p>
+        <dl class="security__list">
+          <div><dt>Read-only, least privilege</dt><dd>We only ask for viewer or read-only roles, limited to the tables and properties we check. You can revoke access at any moment.</dd></div>
+          <div><dt>Personal data is hashed first</dt><dd>Emails and phone numbers are replaced with one-way hashes before analysis. Reports never contain customer names, emails or phones.</dd></div>
+          <div><dt>Deleted after the project</dt><dd>Raw exports are deleted within <span class="ph">30</span> days after an audit ends, or when you cancel monitoring. Ask and we'll confirm the deletion in writing.</dd></div>
+          <div><dt>NDA and DPA</dt><dd>We sign your NDA before seeing any data, and a Data Processing Agreement where GDPR or similar laws apply.</dd></div>
+          <div><dt>No resale, no reuse</dt><dd>Your data is used only to check your data. It is never shared, sold or used to train anything.</dd></div>
+          <div><dt>You can see the method</dt><dd>Every finding comes with example records and the exact rule that flagged it, so your team can verify it independently.</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- ABOUT: a real person builds trust — replace with your details -->
+    <section class="about" id="about">
+      <div class="wrap about__in">
+        <div class="about__photo" aria-hidden="true">YN</div>
+        <div>
+          <h2>Who's behind DataQA</h2>
+          <p><b>[Your name]</b>, [role, e.g. analytics engineer] with [N] years in web analytics and data engineering. [One sentence about relevant experience: e.g. built tracking and reporting for e-commerce and iGaming projects, reconciled GA4 with in-house trackers and warehouses.]</p>
+          <p><a href="https://www.linkedin.com/in/your-profile" rel="me">LinkedIn</a> <a href="#lead">Book a 20-minute call</a></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq" id="faq">
+      <div class="wrap">
+        <h2>Frequently asked questions</h2>
+        <details><summary>What access do you need?</summary><p>Read-only access only: viewer role in GA4 or BigQuery, a read-only CRM user, a warehouse user with SELECT on the tables we check. If you can't grant access, we work from exports in any format: CSV, Excel, JSON.</p></details>
+        <details><summary>What happens to personal data?</summary><p>It never reaches reports or normalized tables: emails and phone numbers are replaced with one-way hashes. Records can still be matched across systems by hash, but the original data cannot be restored.</p></details>
+        <details><summary>How is this different from GA4's built-in diagnostics?</summary><p>GA4 diagnostics only look at GA4. We compare GA4 with your CRM, warehouse, dashboards and what your website actually sends, order by order, and check your project's own business rules.</p></details>
+        <details><summary>Can agencies white-label the reports?</summary><p>Yes. PDF reports carry your agency name, contact and brand color. Monitoring can be added one client project at a time.</p></details>
+        <details><summary>Which tools do you support?</summary><p>GA4 and BigQuery exports, Google Ads and Meta, HubSpot, Salesforce, Shopify, WooCommerce, custom CRMs, PostgreSQL, MySQL, ClickHouse, Snowflake, Looker Studio, Power BI, Metabase, Google Tag Manager and in-house trackers. Anything that can be exported or queried by SQL or API can be reconciled.</p></details>
+        <details><summary>How much does an analytics audit cost?</summary><p>From $100 to $600 depending on data volume and the number of systems. Ongoing monitoring costs $20 per month per report or dashboard, or $150 per month for a whole project.</p></details>
+      </div>
+    </section>
+
+    <!-- REQUEST FORM -->
+    <section class="lead" id="lead">
+      <div class="wrap lead__in">
+        <div class="lead__text">
+          <h2>Get a quote</h2>
+          <p>Tell us about your project. We'll reply with a proposed scope and price.</p>
+          <div class="choice" id="choice" aria-live="polite">
+            <p class="choice__label">Selected</p>
+            <p class="choice__value" id="choice-text">Data audit, estimated $140</p>
+            <a href="#services" class="choice__edit">Change</a>
+          </div>
+        </div>
+
+        <form class="form" id="lead-form" novalidate>
+          <div class="form__row">
+            <label for="f-name">Your name</label>
+            <input id="f-name" name="name" autocomplete="name" required>
+          </div>
+          <div class="form__row">
+            <label for="f-contact">Work email (or WhatsApp / Telegram)</label>
+            <input id="f-contact" name="contact" autocomplete="email" required placeholder="you@company.com">
+          </div>
+          <div class="form__row">
+            <label for="f-company">Company or website</label>
+            <input id="f-company" name="company" autocomplete="organization">
+          </div>
+          <div class="form__row">
+            <label for="f-message">Anything we should know?</label>
+            <textarea id="f-message" name="message" rows="4" placeholder="Which systems, what doesn't add up, timeline"></textarea>
+          </div>
+
+          <!-- hidden fields: selected service and lead source (UTM, click IDs) -->
+          <input type="hidden" name="service">
+          <input type="hidden" name="estimate">
+          <input type="hidden" name="details">
+          <input type="hidden" name="lead_id">
+          <input type="hidden" name="utm_source"><input type="hidden" name="utm_medium"><input type="hidden" name="utm_campaign">
+          <input type="hidden" name="utm_content"><input type="hidden" name="utm_term">
+          <input type="hidden" name="gclid"><input type="hidden" name="yclid"><input type="hidden" name="fbclid">
+          <input type="hidden" name="referrer"><input type="hidden" name="landing_page">
+          <div class="hp" aria-hidden="true"><label>Leave empty<input name="website" tabindex="-1" autocomplete="off"></label></div>
+
+          <label class="check">
+            <input type="checkbox" name="consent" required>
+            <span>I agree to the processing of my data under the <a href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a></span>
+          </label>
+
+          <button class="btn btn--wide" type="submit" id="submit">Send request</button>
+          <p class="form__status" id="status" role="status"></p>
+          <p class="form__note">No spam. We reply within one business day.</p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot__in">
+      <p>DataQA — analytics data reconciliation</p>
+      <p><a id="foot-mail" href="mailto:hello@data-verification.com">hello@data-verification.com</a> <a id="foot-tg" href="https://t.me/example">Telegram</a> <a href="privacy.html">Privacy Policy</a> <a href="#security">Data security</a></p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+
+  <!-- TRACKING (before </body>): scripts that should load last (chat widgets, extra pixels) -->
+</body>
+</html>
