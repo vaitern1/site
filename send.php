@@ -11,7 +11,7 @@
     CSV       — backup copy of every request (keep the file outside the web root)
 */
 
-const EMAIL_TO      = '';                         // e.g. hello@yourdomain.com; empty = no email
+const EMAIL_TO      = 'dmity91@gmail.com';                         // e.g. hello@yourdomain.com; empty = no email
 const EMAIL_FROM    = 'no-reply@data-verification.com';      // an address on your own domain
 const BITRIX24_HOOK = '';                           // https://YOUR-DOMAIN.bitrix24.com/rest/1/CODE/
 const WEBHOOK_URL   = '';                           // https://hook.eu1.make.com/...
