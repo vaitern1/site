@@ -23,4 +23,4 @@ Allow: /
 User-agent: Applebot-Extended
 Allow: /
 
-Sitemap: https://data-verification.com/sitemap.xml
+Sitemap: https://vaitern1.github.io/site/sitemap.xml
