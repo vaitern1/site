@@ -18,7 +18,7 @@ window.SITE_CONFIG = {
 
     php:       { url: "send.php" },
     // ВСТАВЬТЕ ВАШУ ССЫЛКУ ОТ FORMSPREE ВМЕСТО YOUR_ID:
-    formspree: { url: "https://formspree.io/f/ВАШ_ID_ОТ_FORMSPREE" }, 
+    formspree: { url: "https://app.web3forms.com/forms/" }, 
     web3forms: { accessKey: "28660aa0-3163-49f9-bb93-39c1cfcfb944" },
     hubspot:   { portalId: "YOUR_PORTAL_ID", formGuid: "YOUR_FORM_GUID" },
     bitrix24:  { webhook: "https://YOUR-DOMAIN.bitrix24.com/rest/1/YOUR_CODE/" },
