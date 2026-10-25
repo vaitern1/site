@@ -24,10 +24,10 @@
 
 ## Links
 
-- Website: https://data-verification.com/
-- Pricing and request form: https://data-verification.com/#services
-- Data security: https://data-verification.com/#security
-- Sample report (PDF, demo data): https://data-verification.com/sample-report.pdf
-- FAQ: https://data-verification.com/#faq
-- Privacy Policy: https://data-verification.com/privacy.html
+- Website: https://vaitern1.github.io/site/
+- Pricing and request form: https://vaitern1.github.io/site/#services
+- Data security: https://vaitern1.github.io/site/#security
+- Sample report (PDF, demo data): https://vaitern1.github.io/site/sample-report.pdf
+- FAQ: https://vaitern1.github.io/site/#faq
+- Privacy Policy: https://vaitern1.github.io/site/privacy.html
 - Contact: hello@data-verification.com
