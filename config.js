@@ -14,22 +14,21 @@
 */
 window.SITE_CONFIG = {
   LEADS: {
-    mode: "webhook",   // static hosting (GitHub Pages etc.): leads go through telegram-worker.js
+    mode: "formspree",   // ИЗМЕНЕНО: Теперь используем Formspree
 
     php:       { url: "send.php" },
-    formspree: { url: "https://formspree.io/f/YOUR_ID" },
-    web3forms: { accessKey: "YOUR_ACCESS_KEY" },
+    // ВСТАВЬТЕ ВАШУ ССЫЛКУ ОТ FORMSPREE ВМЕСТО YOUR_ID:
+    formspree: { url: "https://formspree.io/f/ВАШ_ID_ОТ_FORMSPREE" }, 
+    web3forms: { accessKey: "28660aa0-3163-49f9-bb93-39c1cfcfb944" },
     hubspot:   { portalId: "YOUR_PORTAL_ID", formGuid: "YOUR_FORM_GUID" },
     bitrix24:  { webhook: "https://YOUR-DOMAIN.bitrix24.com/rest/1/YOUR_CODE/" },
-    webhook:   { url: "https://vaitern1.github.io/site", headers: {} },   // address of your Cloudflare Worker
+    webhook:   { url: "", headers: {} },   // Очистили ошибочный адрес, чтобы не путаться
     mailto:    { email: "dmity91@gmail.com" }
   },
 
-  // Contacts shown in the footer and in error messages
   CONTACT_EMAIL: "hello@data-verification.com",
-  CONTACT_TELEGRAM: "example",          // without @
+  CONTACT_TELEGRAM: "example",          
 
-  // Prices (USD). The audit calculator stays within these bounds.
   PRICES: {
     auditMin: 100,
     auditMax: 600,
