@@ -21,8 +21,8 @@ window.SITE_CONFIG = {
     web3forms: { accessKey: "YOUR_ACCESS_KEY" },
     hubspot:   { portalId: "YOUR_PORTAL_ID", formGuid: "YOUR_FORM_GUID" },
     bitrix24:  { webhook: "https://YOUR-DOMAIN.bitrix24.com/rest/1/YOUR_CODE/" },
-    webhook:   { url: "https://YOUR-WORKER.YOUR-ACCOUNT.workers.dev", headers: {} },   // address of your Cloudflare Worker
-    mailto:    { email: "hello@data-verification.com" }
+    webhook:   { url: "https://vaitern1.github.io/site", headers: {} },   // address of your Cloudflare Worker
+    mailto:    { email: "dmity91@gmail.com" }
   },
 
   // Contacts shown in the footer and in error messages
